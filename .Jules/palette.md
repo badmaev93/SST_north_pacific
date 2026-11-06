@@ -1,0 +1,3 @@
+## 2024-03-01 - Moving Context From Decorative Icons
+**Learning:** Found an accessibility anti-pattern where functional buttons containing SVG icons were using arbitrary textual characters (`alt="&#9664;"`) as alt text to provide labels for screen readers. This causes confusion because screen readers read these raw characters instead of their semantic meaning.
+**Action:** Always provide empty `alt=""` for decorative/icon images and move the semantic labelling up to the interactive parent container (e.g. `<button aria-label="Предыдущий год">...<img alt=""></button>`). When updating the label dynamically based on state (like Play/Pause), update both the `aria-label` and `title` of the parent element.

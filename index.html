@@ -46,6 +46,10 @@ body{font-family:'Segoe UI',system-ui,Arial,sans-serif;background:var(--bg);colo
   color:#fff;border-color:#4a9fdf;font-weight:600;
   box-shadow:0 2px 10px rgba(46,109,180,.45),inset 0 1px 0 rgba(255,255,255,.15);
 }
+.sidebar-btn:focus-visible{
+  outline:2px solid #4a9fdf;
+  outline-offset:2px;
+}
 .sb-legend{width:90px;}
 
 /* === Sections gallery (scroll-snap) === */
@@ -100,6 +104,10 @@ body{font-family:'Segoe UI',system-ui,Arial,sans-serif;background:var(--bg);colo
   color:#fff;border-color:#4a9fdf;font-weight:600;
   box-shadow:0 2px 10px rgba(46,109,180,.45);
 }
+.gbtn:focus-visible,.pbtn:focus-visible{
+  outline:2px solid #4a9fdf;
+  outline-offset:2px;
+}
 .chip{
   padding:2px 8px;
   background:linear-gradient(135deg,rgba(26,58,92,0.75),rgba(36,70,108,0.7));
@@ -116,6 +124,10 @@ body{font-family:'Segoe UI',system-ui,Arial,sans-serif;background:var(--bg);colo
 .chip:hover{
   background:linear-gradient(135deg,rgba(46,109,180,.7),rgba(58,130,210,.65));
   color:#fff;
+}
+.chip:focus-visible{
+  outline:2px solid #5aa0e0;
+  outline-offset:1px;
 }
 #gbar-chips-ess,#gbar-chips-mon{display:inline-flex;align-items:center;gap:2px;flex-wrap:wrap;}
 
@@ -140,10 +152,12 @@ body{font-family:'Segoe UI',system-ui,Arial,sans-serif;background:var(--bg);colo
 }
 .tl-btn:hover{background:rgba(208,228,245,0.9);border-color:#6a9fd8;}
 .tl-btn.playing{background:#2e6da4;border-color:#2e6da4;}
+.tl-btn:focus-visible{outline:2px solid #2e6da4;outline-offset:1px;}
 .tl-btn img{display:block;width:14px;height:14px;}
 .tl-ybadge{font-size:14px;font-weight:700;color:var(--navy);min-width:42px;text-align:center;flex-shrink:0;}
 .tl-slider-block{flex:1;min-width:0;position:relative;padding-bottom:14px;}
 .tl-slider-block input[type=range]{width:100%;accent-color:#2e6da4;cursor:pointer;display:block;}
+.tl-slider-block input[type=range]:focus-visible{outline:2px solid #2e6da4;outline-offset:2px;border-radius:2px;}
 .tl-ticks{position:absolute;top:0;left:0;right:0;height:100%;pointer-events:none;z-index:2;}
 .tl-tick-label{position:absolute;bottom:0;font-size:8px;color:#8a9ab0;transform:translateX(-50%);white-space:nowrap;line-height:1;}
 .tl-tick{position:absolute;top:7px;background:#a0b2c6;transform:translateX(-50%);border-radius:1px;}
@@ -312,14 +326,14 @@ body{font-family:'Segoe UI',system-ui,Arial,sans-serif;background:var(--bg);colo
       <div class="tl-wrap">
         <div class="tl-inner">
           <div class="tl-btns">
-            <button class="tl-btn" onclick="anomPrev('all')"><img src="https://static.ventusky.com/images_v2/icons/misc-prev.svg" width="14" height="14" alt="&#9664;"></button>
-            <button class="tl-btn" id="tl-play-all" onclick="anomPlayPause('all')"><img src="https://static.ventusky.com/images_v2/icons/misc-play.svg" width="14" height="14" alt="&#9654;"></button>
-            <button class="tl-btn" onclick="anomNext('all')"><img src="https://static.ventusky.com/images_v2/icons/misc-next.svg" width="14" height="14" alt="&#9654;&#9654;"></button>
+            <button class="tl-btn" aria-label="Предыдущий год" title="Предыдущий год" onclick="anomPrev('all')"><img src="https://static.ventusky.com/images_v2/icons/misc-prev.svg" width="14" height="14" alt=""></button>
+            <button class="tl-btn" id="tl-play-all" aria-label="Воспроизведение" title="Воспроизведение" onclick="anomPlayPause('all')"><img src="https://static.ventusky.com/images_v2/icons/misc-play.svg" width="14" height="14" alt=""></button>
+            <button class="tl-btn" aria-label="Следующий год" title="Следующий год" onclick="anomNext('all')"><img src="https://static.ventusky.com/images_v2/icons/misc-next.svg" width="14" height="14" alt=""></button>
           </div>
           <span class="tl-ybadge" id="anom-ylabel-all">1979</span>
           <div class="tl-slider-block">
             <input type="range" id="anom-slider-all" min="0" max="47" value="0" step="1"
-                   oninput="updateAnomYear('all',+this.value)">
+                   aria-label="Выбор года" oninput="updateAnomYear('all',+this.value)">
             <div class="tl-ticks" id="tl-ticks-all"></div>
           </div>
         </div>
@@ -328,14 +342,14 @@ body{font-family:'Segoe UI',system-ui,Arial,sans-serif;background:var(--bg);colo
       <div class="tl-wrap">
         <div class="tl-inner">
           <div class="tl-btns">
-            <button class="tl-btn" onclick="anomPrev('1981-2010')"><img src="https://static.ventusky.com/images_v2/icons/misc-prev.svg" width="14" height="14" alt="&#9664;"></button>
-            <button class="tl-btn" id="tl-play-1981-2010" onclick="anomPlayPause('1981-2010')"><img src="https://static.ventusky.com/images_v2/icons/misc-play.svg" width="14" height="14" alt="&#9654;"></button>
-            <button class="tl-btn" onclick="anomNext('1981-2010')"><img src="https://static.ventusky.com/images_v2/icons/misc-next.svg" width="14" height="14" alt="&#9654;&#9654;"></button>
+            <button class="tl-btn" aria-label="Предыдущий год" title="Предыдущий год" onclick="anomPrev('1981-2010')"><img src="https://static.ventusky.com/images_v2/icons/misc-prev.svg" width="14" height="14" alt=""></button>
+            <button class="tl-btn" id="tl-play-1981-2010" aria-label="Воспроизведение" title="Воспроизведение" onclick="anomPlayPause('1981-2010')"><img src="https://static.ventusky.com/images_v2/icons/misc-play.svg" width="14" height="14" alt=""></button>
+            <button class="tl-btn" aria-label="Следующий год" title="Следующий год" onclick="anomNext('1981-2010')"><img src="https://static.ventusky.com/images_v2/icons/misc-next.svg" width="14" height="14" alt=""></button>
           </div>
           <span class="tl-ybadge" id="anom-ylabel-1981-2010">1981</span>
           <div class="tl-slider-block">
             <input type="range" id="anom-slider-1981-2010" min="0" max="29" value="0" step="1"
-                   oninput="updateAnomYear('1981-2010',+this.value)">
+                   aria-label="Выбор года" oninput="updateAnomYear('1981-2010',+this.value)">
             <div class="tl-ticks" id="tl-ticks-1981-2010"></div>
           </div>
         </div>
@@ -344,14 +358,14 @@ body{font-family:'Segoe UI',system-ui,Arial,sans-serif;background:var(--bg);colo
       <div class="tl-wrap">
         <div class="tl-inner">
           <div class="tl-btns">
-            <button class="tl-btn" onclick="anomPrev('1991-2020')"><img src="https://static.ventusky.com/images_v2/icons/misc-prev.svg" width="14" height="14" alt="&#9664;"></button>
-            <button class="tl-btn" id="tl-play-1991-2020" onclick="anomPlayPause('1991-2020')"><img src="https://static.ventusky.com/images_v2/icons/misc-play.svg" width="14" height="14" alt="&#9654;"></button>
-            <button class="tl-btn" onclick="anomNext('1991-2020')"><img src="https://static.ventusky.com/images_v2/icons/misc-next.svg" width="14" height="14" alt="&#9654;&#9654;"></button>
+            <button class="tl-btn" aria-label="Предыдущий год" title="Предыдущий год" onclick="anomPrev('1991-2020')"><img src="https://static.ventusky.com/images_v2/icons/misc-prev.svg" width="14" height="14" alt=""></button>
+            <button class="tl-btn" id="tl-play-1991-2020" aria-label="Воспроизведение" title="Воспроизведение" onclick="anomPlayPause('1991-2020')"><img src="https://static.ventusky.com/images_v2/icons/misc-play.svg" width="14" height="14" alt=""></button>
+            <button class="tl-btn" aria-label="Следующий год" title="Следующий год" onclick="anomNext('1991-2020')"><img src="https://static.ventusky.com/images_v2/icons/misc-next.svg" width="14" height="14" alt=""></button>
           </div>
           <span class="tl-ybadge" id="anom-ylabel-1991-2020">1991</span>
           <div class="tl-slider-block">
             <input type="range" id="anom-slider-1991-2020" min="0" max="29" value="0" step="1"
-                   oninput="updateAnomYear('1991-2020',+this.value)">
+                   aria-label="Выбор года" oninput="updateAnomYear('1991-2020',+this.value)">
             <div class="tl-ticks" id="tl-ticks-1991-2020"></div>
           </div>
         </div>
@@ -809,6 +823,8 @@ function stopPlay(pk){
   const btn=document.getElementById('tl-play-'+pk);
   if(btn){
     btn.classList.remove('playing');
+    btn.setAttribute('aria-label', 'Воспроизведение');
+    btn.setAttribute('title', 'Воспроизведение');
     const img=btn.querySelector('img');
     if(img) img.src=PLAY_ICON;
   }
@@ -835,6 +851,8 @@ function anomPlayPause(pk){
   const btn=document.getElementById('tl-play-'+pk);
   if(btn){
     btn.classList.add('playing');
+    btn.setAttribute('aria-label', 'Пауза');
+    btn.setAttribute('title', 'Пауза');
     const img=btn.querySelector('img');
     if(img) img.src=STOP_ICON;
   }
