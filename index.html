@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ТПО Северная Пацифика</title>
-<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.2/dist/d3.min.js" integrity="sha384-LxfWGZyh6PaLjBRPf7NWiEYs9Mn0UQ6ZmqbLLZhxlOBBNWF2a2K0Pfc5efkrNnhQ" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js" integrity="sha384-Ukv1p/xTma6P4/2bY5KzWBw+ydSpXmhCMtyciIQVDJ1RmOxtCYNMF1uXT9T63H67" crossorigin="anonymous"></script>
 
 <style>
 :root{--navy:#1a3a5c;--blue:#2e6da4;--bg:#e8edf4;--border:#d0dae8;}
@@ -1125,7 +1125,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   }
 
   Promise.all([
-    d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/land-110m.json')
+    d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/land-110m.json')
   ]).then(([world])=>{
     geoCoast=world;
     applyCoastlines();
