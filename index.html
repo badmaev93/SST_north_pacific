@@ -500,6 +500,17 @@ const TIP=document.createElement('div');
 TIP.className='tip';
 document.body.appendChild(TIP);
 
+function setTooltipContent(lat, lon, text) {
+  TIP.innerHTML = '';
+  const b = document.createElement('b');
+  b.textContent = lat + '°N, ' + lon + '°E';
+  TIP.appendChild(b);
+  TIP.appendChild(document.createElement('br'));
+  const span = document.createElement('span');
+  span.textContent = text;
+  TIP.appendChild(span);
+}
+
 function hover(canvas, raw, zmin, zmax, unit, nodata){
   const nodataMsg=nodata||'Нет данных';
   canvas.addEventListener('mousemove',e=>{
@@ -514,10 +525,10 @@ function hover(canvas, raw, zmin, zmax, unit, nodata){
     if(v8===254){
       TIP.style.display='none'; return;
     } else if(v8===253){
-      TIP.innerHTML=`<b>${lat}°N, ${lon}°E</b><br>${nodataMsg}`;
+      setTooltipContent(lat, lon, nodataMsg);
     } else {
       const val=(zmin+(v8/252)*(zmax-zmin)).toFixed(3);
-      TIP.innerHTML=`<b>${lat}°N, ${lon}°E</b><br>${val} ${unit}`;
+      setTooltipContent(lat, lon, val + ' ' + unit);
     }
   });
   canvas.addEventListener('mouseleave',()=>TIP.style.display='none');
@@ -942,8 +953,8 @@ function buildAnomView(elId, pw, ph, _unused_ncols, subs, cvsArr, getCurRaw, sub
       const lat=ANOM_LATS[cj].toFixed(2),lon=ANOM_LONS[ci].toFixed(2);
       TIP.style.display='block'; TIP.style.left=(e.clientX+13)+'px'; TIP.style.top=(e.clientY-32)+'px';
       if(v8===254){TIP.style.display='none';return;}
-      else if(v8===253) TIP.innerHTML=`<b>${lat}°N, ${lon}°E</b><br>Нет данных`;
-      else{const val=((-ANOM_VM)+(v8/252)*(2*ANOM_VM)).toFixed(3); TIP.innerHTML=`<b>${lat}°N, ${lon}°E</b><br>${val} °C`;}
+      else if(v8===253) setTooltipContent(lat, lon, 'Нет данных');
+      else{const val=((-ANOM_VM)+(v8/252)*(2*ANOM_VM)).toFixed(3); setTooltipContent(lat, lon, val + ' °C');}
     });
     cvs.addEventListener('mouseleave',()=>TIP.style.display='none');
     pWrap.appendChild(cvs);
