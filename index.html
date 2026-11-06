@@ -463,6 +463,29 @@ function lut(cs){
   LUT_CACHE[cs]=a; return a;
 }
 
+const IS_LITTLE_ENDIAN = new Uint8Array(new Uint32Array([0x11223344]).buffer)[0] === 0x44;
+const LUT32_CACHE = {};
+function lut32(cs){
+  if(LUT32_CACHE[cs]) return LUT32_CACHE[cs];
+  const L = lut(cs);
+  const a32 = new Uint32Array(256);
+  for(let v=0;v<256;v++){
+    let r, g, b;
+    if(v===254){
+      r = LAND_COLOR[0]; g = LAND_COLOR[1]; b = LAND_COLOR[2];
+    } else if(v===253){
+      r = NODATA_COLOR[0]; g = NODATA_COLOR[1]; b = NODATA_COLOR[2];
+    } else if(v<=252){
+      const idx = Math.round(v/252*255);
+      r = L[idx*3]; g = L[idx*3+1]; b = L[idx*3+2];
+    } else {
+      r = 0; g = 0; b = 0;
+    }
+    a32[v] = IS_LITTLE_ENDIAN ? (255<<24) | (b<<16) | (g<<8) | r : (r<<24) | (g<<16) | (b<<8) | 255;
+  }
+  LUT32_CACHE[cs] = a32; return a32;
+}
+
 function dec(b64){
   const s=atob(b64), a=new Uint8Array(s.length);
   for(let i=0;i<s.length;i++) a[i]=s.charCodeAt(i);
@@ -470,23 +493,14 @@ function dec(b64){
 }
 
 function paint(canvas, raw, cs, W, H){
-  const L=lut(cs);
+  const L32=lut32(cs);
   const tmp=document.createElement('canvas');
   tmp.width=NLON; tmp.height=NLAT;
   const tc=tmp.getContext('2d');
   const img=tc.createImageData(NLON,NLAT);
-  const d=img.data;
-  for(let i=0,p=0;i<NLAT*NLON;i++,p+=4){
-    const v=raw[i];
-    if(v===254){
-      d[p]=LAND_COLOR[0]; d[p+1]=LAND_COLOR[1]; d[p+2]=LAND_COLOR[2];
-    } else if(v===253){
-      d[p]=NODATA_COLOR[0]; d[p+1]=NODATA_COLOR[1]; d[p+2]=NODATA_COLOR[2];
-    } else {
-      const idx=Math.round(v/252*255);
-      d[p]=L[idx*3]; d[p+1]=L[idx*3+1]; d[p+2]=L[idx*3+2];
-    }
-    d[p+3]=255;
+  const d32=new Uint32Array(img.data.buffer);
+  for(let i=0, len=NLAT*NLON; i<len; i++){
+    d32[i] = L32[raw[i]];
   }
   tc.putImageData(img,0,0);
   canvas.width=W; canvas.height=H;
@@ -883,18 +897,14 @@ window.setPeriod=function(pk){
 };
 
 function paintAnom(cvs, raw, W, H){
-  const L=lut('RdBu_r');
+  const L32=lut32('RdBu_r');
   const tmp=document.createElement('canvas');
   tmp.width=ANOM_NLON; tmp.height=ANOM_NLAT;
   const tc=tmp.getContext('2d');
   const img=tc.createImageData(ANOM_NLON,ANOM_NLAT);
-  const d=img.data;
-  for(let i=0,p=0;i<ANOM_NLAT*ANOM_NLON;i++,p+=4){
-    const v=raw[i];
-    if(v===254){d[p]=LAND_COLOR[0];d[p+1]=LAND_COLOR[1];d[p+2]=LAND_COLOR[2];}
-    else if(v===253){d[p]=NODATA_COLOR[0];d[p+1]=NODATA_COLOR[1];d[p+2]=NODATA_COLOR[2];}
-    else{const idx=Math.round(v/252*255);d[p]=L[idx*3];d[p+1]=L[idx*3+1];d[p+2]=L[idx*3+2];}
-    d[p+3]=255;
+  const d32=new Uint32Array(img.data.buffer);
+  for(let i=0, len=ANOM_NLAT*ANOM_NLON; i<len; i++){
+    d32[i] = L32[raw[i]];
   }
   tc.putImageData(img,0,0);
   cvs.width=W; cvs.height=H;
