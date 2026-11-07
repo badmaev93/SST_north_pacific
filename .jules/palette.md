@@ -1,0 +1,3 @@
+## 2024-03-24 - Semantic Landmarks & Accessible Sliders
+**Learning:** Using generic `<div>` tags for major page sections (sidebar, main content area, footer controls) prevents screen readers from understanding the page structure. Furthermore, range sliders that use index values internally announce useless numbers (0, 1, 2) instead of the actual data (e.g., years) unless `aria-valuetext` is dynamically updated.
+**Action:** Replace structural `<div>`s with `<nav>`, `<main>`, and `<footer>` where appropriate. When a range input acts as an array index selector, always update its `aria-valuetext` via JS so screen readers announce the semantic value (e.g., the year).
