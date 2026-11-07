@@ -1,3 +1,7 @@
 ## 2024-06-25 - Using 32-bit ArrayBuffer views for canvas pixel manipulation
 **Learning:** When manipulating `ImageData` in HTML Canvas, updating individual R, G, B, and A channels via the `Uint8ClampedArray` (e.g. `img.data[p] = r; img.data[p+1] = g; ...`) is slow due to array bounds checking and multiple assignments per pixel. Additionally, conditional branching inside per-pixel loops severely degrades performance in V8/SpiderMonkey.
 **Action:** Instead, cast the `img.data.buffer` to a `Uint32Array` (e.g. `new Uint32Array(img.data.buffer)`) and use a precomputed 32-bit color look-up table (LUT) to assign the entire pixel in a single operation: `img32[i] = LUT32[raw[i]]`. Account for system endianness when precomputing the 32-bit integer colors. This eliminates branching and reduces assignments by 75%.
+
+## 2025-01-20 - Memoizing D3 paths and topojson meshes for small multiples
+**Learning:** In a dashboard with hundreds of small multiples (maps) of identical dimensions, computing the geographical topology mesh (`topojson.mesh`) and evaluating the D3 path (`d3.geoPath().projection()`) repeatedly for each canvas element becomes a massive CPU bottleneck, as stringifying complex SVG paths takes significant time.
+**Action:** Extract the result of `topojson.mesh` to a global variable so it's only computed once. More importantly, cache the resulting SVG path `d` string keyed by the dimensions of the map (`pw` x `ph`). Subsequent maps of the same size simply reuse the cached string, completely skipping projection and path generation for subsequent multiples.

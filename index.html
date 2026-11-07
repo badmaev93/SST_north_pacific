@@ -630,6 +630,8 @@ function drawSectionLegend(el, cs, zmin, zmax, unit, forceDec=null){
 }
 
 let geoCoast = null;
+let _geoLandMesh = null;
+const _coastPathCache = {};
 const coastTargets = [];
 
 function applyCoastlines(){
@@ -639,39 +641,49 @@ function applyCoastlines(){
 
 function attachCoastline(svgSel, pw, ph){
   const fn = (world) => {
-    const lonL=LONS[0], lonR=LONS[NLON-1];
-    const latT=LATS[0], latB=LATS[NLAT-1];
-    const xSc=d3.scaleLinear().domain([lonL,lonR]).range([0,pw]);
-    const ySc=d3.scaleLinear().domain([latT,latB]).range([0,ph]);
-    const threshold=pw*0.25;
-    const proj={
-      stream: function(s){
-        let px=null, lineOpen=false;
-        return {
-          point(lon,lat){
-            let lo=lon;
-            while(lo<lonL-180) lo+=360;
-            while(lo>lonL+180) lo-=360;
-            const x=xSc(lo), y=ySc(lat);
-            if(lineOpen && px!==null && Math.abs(x-px)>threshold){s.lineEnd();s.lineStart();}
-            s.point(x,y); px=x;
-          },
-          lineStart(){s.lineStart();lineOpen=true;px=null;},
-          lineEnd(){s.lineEnd();lineOpen=false;px=null;},
-          polygonStart(){s.polygonStart();}, polygonEnd(){s.polygonEnd();},
-          sphere(){s.sphere();}
-        };
+    const cacheKey = pw + 'x' + ph;
+    let dStr = _coastPathCache[cacheKey];
+
+    if (!dStr) {
+      const lonL=LONS[0], lonR=LONS[NLON-1];
+      const latT=LATS[0], latB=LATS[NLAT-1];
+      const xSc=d3.scaleLinear().domain([lonL,lonR]).range([0,pw]);
+      const ySc=d3.scaleLinear().domain([latT,latB]).range([0,ph]);
+      const threshold=pw*0.25;
+      const proj={
+        stream: function(s){
+          let px=null, lineOpen=false;
+          return {
+            point(lon,lat){
+              let lo=lon;
+              while(lo<lonL-180) lo+=360;
+              while(lo>lonL+180) lo-=360;
+              const x=xSc(lo), y=ySc(lat);
+              if(lineOpen && px!==null && Math.abs(x-px)>threshold){s.lineEnd();s.lineStart();}
+              s.point(x,y); px=x;
+            },
+            lineStart(){s.lineStart();lineOpen=true;px=null;},
+            lineEnd(){s.lineEnd();lineOpen=false;px=null;},
+            polygonStart(){s.polygonStart();}, polygonEnd(){s.polygonEnd();},
+            sphere(){s.sphere();}
+          };
+        }
+      };
+      const path=d3.geoPath().projection(proj);
+      if (!_geoLandMesh) {
+        _geoLandMesh = topojson.mesh(world, world.objects.land);
       }
-    };
-    const path=d3.geoPath().projection(proj);
-    const land=topojson.mesh(world,world.objects.land);
+      dStr = path(_geoLandMesh);
+      _coastPathCache[cacheKey] = dStr;
+    }
+
     const clipId='clip-'+(++_gid);
     svgSel.append('defs').append('clipPath').attr('id',clipId)
       .append('rect').attr('width',pw).attr('height',ph);
     const g=svgSel.append('g').attr('clip-path',`url(#${clipId})`);
-    g.append('path').datum(land).attr('d',path).attr('fill','none')
+    g.append('path').attr('d',dStr).attr('fill','none')
       .attr('stroke','rgba(255,255,255,0.7)').attr('stroke-width',2.5).attr('stroke-linejoin','round');
-    g.append('path').datum(land).attr('d',path).attr('fill','none')
+    g.append('path').attr('d',dStr).attr('fill','none')
       .attr('stroke','#111').attr('stroke-width',1.0).attr('stroke-linejoin','round');
   };
   coastTargets.push(fn);
