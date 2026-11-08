@@ -5,3 +5,7 @@
 ## 2025-01-20 - Memoizing D3 paths and topojson meshes for small multiples
 **Learning:** In a dashboard with hundreds of small multiples (maps) of identical dimensions, computing the geographical topology mesh (`topojson.mesh`) and evaluating the D3 path (`d3.geoPath().projection()`) repeatedly for each canvas element becomes a massive CPU bottleneck, as stringifying complex SVG paths takes significant time.
 **Action:** Extract the result of `topojson.mesh` to a global variable so it's only computed once. More importantly, cache the resulting SVG path `d` string keyed by the dimensions of the map (`pw` x `ph`). Subsequent maps of the same size simply reuse the cached string, completely skipping projection and path generation for subsequent multiples.
+
+## 2025-01-20 - Reusing Canvas and ImageData objects to reduce GC pressure
+**Learning:** In a dashboard with frequent canvas rendering (especially during timeline animations like `paintAnom` called every 600ms), creating a new `canvas` and `ImageData` buffer on every call results in thousands of allocations and severe garbage collection pressure, leading to jank.
+**Action:** Declare scoped variables for the temporary offscreen canvas, 2D context, and `ImageData`. Instantiate them only once on the first call and reuse them for all subsequent paints. Since the maps in this application have fixed dimensions (`NLON`x`NLAT` for standard, `ANOM_NLON`x`ANOM_NLAT` for anomalies), the same shared buffer can be reused safely.

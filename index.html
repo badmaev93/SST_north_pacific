@@ -507,22 +507,32 @@ function dec(b64){
   return a;
 }
 
+// Cached canvas and imagedata for standard maps to reduce GC overhead
+let _sharedPaintTmpCanvas = null;
+let _sharedPaintTc = null;
+let _sharedPaintImg = null;
+let _sharedPaintD32 = null;
+
 function paint(canvas, raw, cs, W, H){
   const L32=lut32(cs);
-  const tmp=document.createElement('canvas');
-  tmp.width=NLON; tmp.height=NLAT;
-  const tc=tmp.getContext('2d');
-  const img=tc.createImageData(NLON,NLAT);
-  const d32=new Uint32Array(img.data.buffer);
-  for(let i=0, len=NLAT*NLON; i<len; i++){
-    d32[i] = L32[raw[i]];
+  if (!_sharedPaintTmpCanvas) {
+    _sharedPaintTmpCanvas = document.createElement('canvas');
+    _sharedPaintTmpCanvas.width = NLON;
+    _sharedPaintTmpCanvas.height = NLAT;
+    _sharedPaintTc = _sharedPaintTmpCanvas.getContext('2d');
+    _sharedPaintImg = _sharedPaintTc.createImageData(NLON, NLAT);
+    _sharedPaintD32 = new Uint32Array(_sharedPaintImg.data.buffer);
   }
-  tc.putImageData(img,0,0);
+
+  for(let i=0, len=NLAT*NLON; i<len; i++){
+    _sharedPaintD32[i] = L32[raw[i]];
+  }
+  _sharedPaintTc.putImageData(_sharedPaintImg,0,0);
   canvas.width=W; canvas.height=H;
   const ctx=canvas.getContext('2d');
   ctx.imageSmoothingEnabled=true;
   ctx.imageSmoothingQuality='high';
-  ctx.drawImage(tmp,0,0,W,H);
+  ctx.drawImage(_sharedPaintTmpCanvas,0,0,W,H);
 }
 
 const TIP=document.createElement('div');
@@ -938,21 +948,30 @@ window.setPeriod=function(pk){
   },10);
 };
 
+// Cached canvas and imagedata for anomaly maps to reduce GC overhead
+let _sharedAnomTmpCanvas = null;
+let _sharedAnomTc = null;
+let _sharedAnomImg = null;
+let _sharedAnomD32 = null;
+
 function paintAnom(cvs, raw, W, H){
   const L32=lut32('RdBu_r');
-  const tmp=document.createElement('canvas');
-  tmp.width=ANOM_NLON; tmp.height=ANOM_NLAT;
-  const tc=tmp.getContext('2d');
-  const img=tc.createImageData(ANOM_NLON,ANOM_NLAT);
-  const d32=new Uint32Array(img.data.buffer);
-  for(let i=0, len=ANOM_NLAT*ANOM_NLON; i<len; i++){
-    d32[i] = L32[raw[i]];
+  if (!_sharedAnomTmpCanvas) {
+    _sharedAnomTmpCanvas = document.createElement('canvas');
+    _sharedAnomTmpCanvas.width = ANOM_NLON;
+    _sharedAnomTmpCanvas.height = ANOM_NLAT;
+    _sharedAnomTc = _sharedAnomTmpCanvas.getContext('2d');
+    _sharedAnomImg = _sharedAnomTc.createImageData(ANOM_NLON, ANOM_NLAT);
+    _sharedAnomD32 = new Uint32Array(_sharedAnomImg.data.buffer);
   }
-  tc.putImageData(img,0,0);
+  for(let i=0, len=ANOM_NLAT*ANOM_NLON; i<len; i++){
+    _sharedAnomD32[i] = L32[raw[i]];
+  }
+  _sharedAnomTc.putImageData(_sharedAnomImg,0,0);
   cvs.width=W; cvs.height=H;
   const ctx=cvs.getContext('2d');
   ctx.imageSmoothingEnabled=true; ctx.imageSmoothingQuality='high';
-  ctx.drawImage(tmp,0,0,W,H);
+  ctx.drawImage(_sharedAnomTmpCanvas,0,0,W,H);
 }
 
 function buildAnomView(elId, pw, ph, _unused_ncols, subs, cvsArr, getCurRaw, subElsArr){
