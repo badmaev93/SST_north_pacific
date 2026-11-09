@@ -537,17 +537,17 @@ function paint(canvas, raw, cs, W, H){
 
 const TIP=document.createElement('div');
 TIP.className='tip';
+const tipB = document.createElement('b');
+const tipSpan = document.createElement('span');
+TIP.appendChild(tipB);
+TIP.appendChild(document.createElement('br'));
+TIP.appendChild(tipSpan);
 document.body.appendChild(TIP);
 
+// ⚡ Bolt: Reuse DOM elements instead of creating new ones on every mousemove to reduce GC pressure and avoid jank
 function setTooltipContent(lat, lon, text) {
-  TIP.innerHTML = '';
-  const b = document.createElement('b');
-  b.textContent = lat + '°N, ' + lon + '°E';
-  TIP.appendChild(b);
-  TIP.appendChild(document.createElement('br'));
-  const span = document.createElement('span');
-  span.textContent = text;
-  TIP.appendChild(span);
+  tipB.textContent = lat + '°N, ' + lon + '°E';
+  tipSpan.textContent = text;
 }
 
 function hover(canvas, raw, zmin, zmax, unit, nodata){
