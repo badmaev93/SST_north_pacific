@@ -9,3 +9,7 @@
 ## 2025-01-20 - Reusing Canvas and ImageData objects to reduce GC pressure
 **Learning:** In a dashboard with frequent canvas rendering (especially during timeline animations like `paintAnom` called every 600ms), creating a new `canvas` and `ImageData` buffer on every call results in thousands of allocations and severe garbage collection pressure, leading to jank.
 **Action:** Declare scoped variables for the temporary offscreen canvas, 2D context, and `ImageData`. Instantiate them only once on the first call and reuse them for all subsequent paints. Since the maps in this application have fixed dimensions (`NLON`x`NLAT` for standard, `ANOM_NLON`x`ANOM_NLAT` for anomalies), the same shared buffer can be reused safely.
+
+## 2025-01-20 - Reusing DOM elements in high-frequency event handlers
+**Learning:** The `setTooltipContent` function was dynamically creating new DOM elements (`b`, `br`, `span`) and setting `innerHTML` on every `mousemove` event across the maps. This continuous allocation and deallocation of DOM nodes creates significant Garbage Collection (GC) pressure, causing the main thread to block and resulting in UI jank.
+**Action:** Extract DOM element creation outside of high-frequency event handlers. Initialize the structural DOM nodes once when their container is created, and only update their `textContent` (or `style`) inside the event handler to eliminate unnecessary GC pauses.
