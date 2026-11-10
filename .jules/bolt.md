@@ -13,3 +13,7 @@
 ## 2025-01-20 - Reusing DOM elements in high-frequency event handlers
 **Learning:** The `setTooltipContent` function was dynamically creating new DOM elements (`b`, `br`, `span`) and setting `innerHTML` on every `mousemove` event across the maps. This continuous allocation and deallocation of DOM nodes creates significant Garbage Collection (GC) pressure, causing the main thread to block and resulting in UI jank.
 **Action:** Extract DOM element creation outside of high-frequency event handlers. Initialize the structural DOM nodes once when their container is created, and only update their `textContent` (or `style`) inside the event handler to eliminate unnecessary GC pauses.
+
+## 2026-11-09 - CSS Tooltip Repaint Thrashing
+**Learning:** Updating `top` and `left` properties on absolutely positioned elements in a high-frequency event like `mousemove` causes continuous layout recalculations (reflows) on the main thread, acting as a measurable performance bottleneck in large UI updates.
+**Action:** Use CSS `transform: translate(x, y)` combined with `will-change: transform` and fixed `top: 0; left: 0;` coordinates for tooltips. This delegates movement to the compositor thread (GPU) and prevents layout thrashing during mouse interactions.
