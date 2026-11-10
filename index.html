@@ -194,14 +194,37 @@ body{font-family:'Segoe UI',system-ui,Arial,sans-serif;background:var(--bg);colo
 ::-webkit-scrollbar-track{background:#dde4ef;}
 ::-webkit-scrollbar-thumb{background:#8aaac8;border-radius:3px;}
 ::-webkit-scrollbar-thumb:hover{background:var(--blue);}
+
+/* === Accessibility === */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #2e6da4;
+  color: white;
+  padding: 8px;
+  z-index: 10000;
+  transition: top 0.2s;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: bold;
+}
+.skip-link:focus {
+  top: 0;
+}
+.sections-wrap:focus-visible {
+  outline: 2px solid #4a9fdf;
+  outline-offset: -2px;
+}
 </style>
 
 </head>
 <body>
+<a href="#sections-wrap" class="skip-link">Перейти к картам</a>
 <div class="page-layout">
   <div class="page-middle">
     <nav class="sidebar" aria-label="Навигация по разделам"><button class="sidebar-btn active" aria-current="true" data-section="s1" onclick="scrollToSection('s1')">Клим. среднее</button><button class="sidebar-btn" aria-current="false" data-section="s2" onclick="scrollToSection('s2')">Тренд</button><button class="sidebar-btn" aria-current="false" data-section="s3" onclick="scrollToSection('s3')">R²</button><button class="sidebar-btn" aria-current="false" data-section="s4" onclick="scrollToSection('s4')">Дисперсия</button><button class="sidebar-btn" aria-current="false" data-section="s5" onclick="scrollToSection('s5')">Тренд дисп.</button><button class="sidebar-btn" aria-current="false" data-section="s6" onclick="scrollToSection('s6')">Фронты</button><button class="sidebar-btn" aria-current="false" data-section="s7" onclick="scrollToSection('s7')">Аномалии</button></nav>
-    <main class="sections-wrap" id="sections-wrap">
+    <main class="sections-wrap" id="sections-wrap" tabindex="0">
 
 <div class="section" id="s1">
   <div class="sec-hdr"><h2 class="sec-hdr-title">Климатологическое среднее ТПО</h2></div>
