@@ -593,18 +593,26 @@ function hover(canvas, raw, zmin, zmax, unit, nodata){
     const cj=Math.min(NLAT-1,Math.max(0,Math.floor((e.clientY-r.top)/r.height*NLAT)));
     const v8=raw[cj*NLON+ci];
     const lat=LATS[cj].toFixed(2), lon=LONS[ci].toFixed(2);
-    TIP.style.display='block';
-    TIP.style.transform=`translate(${e.clientX+13}px,${e.clientY-32}px)`;
-    if(v8===254){
-      TIP.style.display='none'; return;
-    } else if(v8===253){
-      setTooltipContent(lat, lon, nodataMsg);
-    } else {
-      const val=(zmin+(v8/252)*(zmax-zmin)).toFixed(3);
-      setTooltipContent(lat, lon, val + ' ' + unit);
-    }
+
+    // ⚡ Bolt: Use requestAnimationFrame to throttle tooltip DOM updates and prevent layout thrashing on fast mouse movements
+    if(canvas._tipRafId) cancelAnimationFrame(canvas._tipRafId);
+    canvas._tipRafId = requestAnimationFrame(() => {
+      TIP.style.display='block';
+      TIP.style.transform=`translate(${e.clientX+13}px,${e.clientY-32}px)`;
+      if(v8===254){
+        TIP.style.display='none';
+      } else if(v8===253){
+        setTooltipContent(lat, lon, nodataMsg);
+      } else {
+        const val=(zmin+(v8/252)*(zmax-zmin)).toFixed(3);
+        setTooltipContent(lat, lon, val + ' ' + unit);
+      }
+    });
   });
-  canvas.addEventListener('mouseleave',()=>TIP.style.display='none');
+  canvas.addEventListener('mouseleave',()=>{
+    if(canvas._tipRafId) cancelAnimationFrame(canvas._tipRafId);
+    TIP.style.display='none';
+  });
 }
 
 let _gid=0;
@@ -1069,12 +1077,20 @@ function buildAnomView(elId, pw, ph, _unused_ncols, subs, cvsArr, getCurRaw, sub
       const cj=Math.min(ANOM_NLAT-1,Math.max(0,Math.floor((e.clientY-r.top)/r.height*ANOM_NLAT)));
       const v8=raw[cj*ANOM_NLON+ci];
       const lat=ANOM_LATS[cj].toFixed(2),lon=ANOM_LONS[ci].toFixed(2);
-      TIP.style.display='block'; TIP.style.transform=`translate(${e.clientX+13}px,${e.clientY-32}px)`;
-      if(v8===254){TIP.style.display='none';return;}
-      else if(v8===253) setTooltipContent(lat, lon, 'Нет данных');
-      else{const val=((-ANOM_VM)+(v8/252)*(2*ANOM_VM)).toFixed(3); setTooltipContent(lat, lon, val + ' °C');}
+
+      // ⚡ Bolt: Use requestAnimationFrame to throttle tooltip DOM updates and prevent layout thrashing on fast mouse movements
+      if(cvs._tipRafId) cancelAnimationFrame(cvs._tipRafId);
+      cvs._tipRafId = requestAnimationFrame(() => {
+        TIP.style.display='block'; TIP.style.transform=`translate(${e.clientX+13}px,${e.clientY-32}px)`;
+        if(v8===254){TIP.style.display='none';}
+        else if(v8===253) setTooltipContent(lat, lon, 'Нет данных');
+        else{const val=((-ANOM_VM)+(v8/252)*(2*ANOM_VM)).toFixed(3); setTooltipContent(lat, lon, val + ' °C');}
+      });
     });
-    cvs.addEventListener('mouseleave',()=>TIP.style.display='none');
+    cvs.addEventListener('mouseleave',()=>{
+      if(cvs._tipRafId) cancelAnimationFrame(cvs._tipRafId);
+      TIP.style.display='none';
+    });
     pWrap.appendChild(cvs);
     const svgEl=d3.select(pWrap).append('svg')
       .style('position','absolute').style('left','0').style('top','0')

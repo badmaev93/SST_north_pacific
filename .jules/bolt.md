@@ -17,3 +17,7 @@
 ## 2026-11-09 - CSS Tooltip Repaint Thrashing
 **Learning:** Updating `top` and `left` properties on absolutely positioned elements in a high-frequency event like `mousemove` causes continuous layout recalculations (reflows) on the main thread, acting as a measurable performance bottleneck in large UI updates.
 **Action:** Use CSS `transform: translate(x, y)` combined with `will-change: transform` and fixed `top: 0; left: 0;` coordinates for tooltips. This delegates movement to the compositor thread (GPU) and prevents layout thrashing during mouse interactions.
+
+## 2024-05-19 - requestAnimationFrame throttling for tooltip DOM updates
+**Learning:** In `index.html`, tooltip updates were directly linked to `mousemove` events. Because retrieving cursor coordinates required `canvas.getBoundingClientRect()` and the tooltip was immediately updated (`TIP.style.display` and `TIP.style.transform`), this created synchronous read/write layout thrashing, severely degrading performance during rapid mouse movements on large maps.
+**Action:** Always wrap high-frequency DOM mutations that follow geometric reads (like `getBoundingClientRect()`) within `requestAnimationFrame`. Maintain a frame ID (e.g. `canvas._tipRafId`) to cancel previous pending frames, preventing overlapping render work.
