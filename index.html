@@ -131,12 +131,12 @@ body{font-family:'Segoe UI',system-ui,Arial,sans-serif;background:var(--bg);colo
   outline:2px solid #5aa0e0;
   outline-offset:1px;
 }
-.chip:disabled{
+.chip[aria-disabled="true"]{
   opacity:0.5;
   cursor:not-allowed;
   box-shadow:none;
 }
-.chip:disabled:hover{
+.chip[aria-disabled="true"]:hover{
   background:linear-gradient(135deg,rgba(46,120,190,.8),rgba(58,140,220,.75));
 }
 #gbar-chips-ess,#gbar-chips-mon{display:inline-flex;align-items:center;gap:2px;flex-wrap:wrap;}
@@ -163,8 +163,8 @@ body{font-family:'Segoe UI',system-ui,Arial,sans-serif;background:var(--bg);colo
 .tl-btn:hover{background:rgba(208,228,245,0.9);border-color:#6a9fd8;}
 .tl-btn.playing{background:#2e6da4;border-color:#2e6da4;}
 .tl-btn:focus-visible{outline:2px solid #2e6da4;outline-offset:1px;}
-.tl-btn:disabled{opacity:0.4;cursor:not-allowed;}
-.tl-btn:disabled:hover{background:rgba(240,244,250,0.9);border-color:#c0d0e0;}
+.tl-btn[aria-disabled="true"]{opacity:0.4;cursor:not-allowed;}
+.tl-btn[aria-disabled="true"]:hover{background:rgba(240,244,250,0.9);border-color:#c0d0e0;}
 .tl-btn img{display:block;width:14px;height:14px;}
 .tl-ybadge{font-size:14px;font-weight:700;color:var(--navy);min-width:42px;text-align:center;flex-shrink:0;}
 .tl-slider-block{flex:1;min-width:0;position:relative;padding-bottom:14px;}
@@ -866,6 +866,10 @@ function filterPanels(view){
 }
 
 window.toggleChip=function(view,idx){
+  const btn = document.querySelector(`#gbar-chips-${view} .chip[data-idx="${idx}"]`);
+  if (btn && btn.getAttribute('aria-disabled') === 'true') {
+    return;
+  }
   if(_panelSel[view].has(idx)){
     if(_panelSel[view].size<=1) return;
     _panelSel[view].delete(idx);
@@ -877,7 +881,8 @@ window.toggleChip=function(view,idx){
     c.classList.toggle('active', isActive);
     c.setAttribute('aria-pressed', isActive ? 'true' : 'false');
     const shouldBeDisabled = _panelSel[view].size === 1 && isActive;
-    c.disabled = shouldBeDisabled;
+    c.removeAttribute('disabled');
+    c.setAttribute('aria-disabled', shouldBeDisabled ? 'true' : 'false');
     if (shouldBeDisabled) {
       c.title = "Оставьте хотя бы один элемент";
     } else {
@@ -924,6 +929,8 @@ function stopPlay(pk){
 }
 
 function anomPrev(pk){
+  const btn = document.querySelector(`button[onclick="anomPrev('${pk}')"]`);
+  if (btn && btn.getAttribute('aria-disabled') === 'true') return;
   stopPlay(pk);
   const idx=Math.max(0,(_anomYearIdx[pk]||0)-1);
   document.getElementById('anom-slider-'+pk).value=idx;
@@ -931,6 +938,8 @@ function anomPrev(pk){
 }
 
 function anomNext(pk){
+  const btn = document.querySelector(`button[onclick="anomNext('${pk}')"]`);
+  if (btn && btn.getAttribute('aria-disabled') === 'true') return;
   stopPlay(pk);
   const src=ALL_ANOM_DATA[pk];
   const idx=Math.min(src.years.length-1,(_anomYearIdx[pk]||0)+1);
@@ -1133,8 +1142,8 @@ function updateAnomYear(pk, val){
 
   const prevBtn = document.querySelector(`button[onclick="anomPrev('${pk}')"]`);
   const nextBtn = document.querySelector(`button[onclick="anomNext('${pk}')"]`);
-  if (prevBtn) prevBtn.disabled = +val === 0;
-  if (nextBtn) nextBtn.disabled = +val === ALL_ANOM_DATA[pk].years.length - 1;
+  if (prevBtn) { prevBtn.removeAttribute('disabled'); prevBtn.setAttribute('aria-disabled', +val === 0 ? 'true' : 'false'); }
+  if (nextBtn) { nextBtn.removeAttribute('disabled'); nextBtn.setAttribute('aria-disabled', +val === ALL_ANOM_DATA[pk].years.length - 1 ? 'true' : 'false'); }
 }
 
 window.setView=setView;
