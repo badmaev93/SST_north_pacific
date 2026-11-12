@@ -1252,8 +1252,14 @@ document.addEventListener('DOMContentLoaded',()=>{
   Promise.all([
     d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/land-110m.json')
   ]).then(([world])=>{
-    geoCoast=world;
-    applyCoastlines();
+    // Sentinel: Validate third-party JSON input structure before using it
+    // to prevent application crash if the CDN is compromised or data is malformed
+    if (world && typeof world === 'object' && world.objects && world.objects.land) {
+      geoCoast=world;
+      applyCoastlines();
+    } else {
+      console.warn('Некорректный формат topojson от CDN');
+    }
   }).catch(()=>{
     console.warn('Не удалось загрузить topojson береговой линии');
   });
