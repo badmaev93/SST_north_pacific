@@ -563,8 +563,13 @@ function paint(canvas, raw, cs, W, H){
     _sharedPaintD32[i] = L32[raw[i]];
   }
   _sharedPaintTc.putImageData(_sharedPaintImg,0,0);
-  canvas.width=W; canvas.height=H;
   const ctx=canvas.getContext('2d');
+  if (canvas.width !== W || canvas.height !== H) {
+    canvas.width = W;
+    canvas.height = H;
+  } else {
+    ctx.clearRect(0, 0, W, H);
+  }
   ctx.imageSmoothingEnabled=true;
   ctx.imageSmoothingQuality='high';
   ctx.drawImage(_sharedPaintTmpCanvas,0,0,W,H);
@@ -1034,8 +1039,13 @@ function paintAnom(cvs, raw, W, H){
     _sharedAnomD32[i] = L32[raw[i]];
   }
   _sharedAnomTc.putImageData(_sharedAnomImg,0,0);
-  cvs.width=W; cvs.height=H;
   const ctx=cvs.getContext('2d');
+  if (cvs.width !== W || cvs.height !== H) {
+    cvs.width = W;
+    cvs.height = H;
+  } else {
+    ctx.clearRect(0, 0, W, H);
+  }
   ctx.imageSmoothingEnabled=true; ctx.imageSmoothingQuality='high';
   ctx.drawImage(_sharedAnomTmpCanvas,0,0,W,H);
 }

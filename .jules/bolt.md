@@ -21,3 +21,7 @@
 ## 2024-05-19 - requestAnimationFrame throttling for tooltip DOM updates
 **Learning:** In `index.html`, tooltip updates were directly linked to `mousemove` events. Because retrieving cursor coordinates required `canvas.getBoundingClientRect()` and the tooltip was immediately updated (`TIP.style.display` and `TIP.style.transform`), this created synchronous read/write layout thrashing, severely degrading performance during rapid mouse movements on large maps.
 **Action:** Always wrap high-frequency DOM mutations that follow geometric reads (like `getBoundingClientRect()`) within `requestAnimationFrame`. Maintain a frame ID (e.g. `canvas._tipRafId`) to cancel previous pending frames, preventing overlapping render work.
+
+## 2024-05-24 - HTML5 Canvas Optimization
+**Learning:** Reassigning `canvas.width` and `canvas.height` with the same values forces the browser to destroy and recreate the canvas's internal memory buffers and reset the graphics state, which is a performance bottleneck.
+**Action:** When updating a canvas, explicitly check if dimensions have changed. If not, use `ctx.clearRect()` instead to avoid unnecessary memory reallocation and state reset overhead.
